@@ -8,52 +8,16 @@ namespace TSP
 {
     class ProblemAndSolver
     {
-        private class TSPSolution
-        {
-            /// <summary>
-            /// we use the representation [cityB,cityA,cityC] 
-            /// to mean that cityB is the first city in the solution, cityA is the second, cityC is the third 
-            /// and the edge from cityC to cityB is the final edge in the path.  
-            /// you are, of course, free to use a different representation if it would be more convenient or efficient 
-            /// for your node data structure and search algorithm. 
-            /// </summary>
-            public ArrayList 
-                Route;
-
-            public TSPSolution(ArrayList iroute)
-            {
-                Route = new ArrayList(iroute);
-            }
-
-
-            /// <summary>
-            ///  compute the cost of the current route.  does not check that the route is complete, btw.
-            /// assumes that the route passes from the last city back to the first city. 
-            /// </summary>
-            /// <returns></returns>
-            public double costOfRoute()
-            {
-                // go through each edge in the route and add up the cost. 
-                int x;
-                City here; 
-                double cost = 0D;
-                
-                for (x = 0; x < Route.Count-1; x++)
-                {
-                    here = Route[x] as City;
-                    cost += here.costToGetTo(Route[x + 1] as City);
-                }
-                // go from the last city to the first. 
-                here = Route[Route.Count - 1] as City;
-                cost += here.costToGetTo(Route[0] as City);
-                return cost; 
-            }
-        }
-
+        
         #region private members
+
+        private BranchAndBound solver;
+
         private const int DEFAULT_SIZE = 25;
         
         private const int CITY_ICON_SIZE = 5;
+
+        private const int MAX_RUNNING_TIME = 60;
 
         /// <summary>
         /// the cities in the current problem.
@@ -186,6 +150,7 @@ namespace TSP
         /// <param name="g">where to draw the stuff</param>
         public void Draw(Graphics g)
         {
+
             float width  = g.VisibleClipBounds.Width-45F;
             float height = g.VisibleClipBounds.Height-15F;
             Font labelFont = new Font("Arial", 10);
@@ -232,7 +197,7 @@ namespace TSP
         public double costOfBssf ()
         {
             if (bssf != null)
-                return (bssf.costOfRoute());
+                return (bssf.GetCost());
             else
                 return -1D; 
         }
@@ -243,19 +208,15 @@ namespace TSP
         /// </summary>
         public void solveProblem()
         {
-            int x;
-            Route = new ArrayList(); 
-            // this is the trivial solution. 
-            for (x = 0; x < Cities.Length; x++)
-            {
-                Route.Add( Cities[Cities.Length - x -1]);
-            }
-            // call this the best solution so far.  bssf is the route that will be drawn by the Draw method. 
-            bssf = new TSPSolution(Route);
-            // update the cost of the tour. 
-            Program.MainForm.tbCostOfTour.Text = " " + bssf.costOfRoute();
+            solver = new BranchAndBound( Cities );
+
+            bssf = solver.AnalyzePath( MAX_RUNNING_TIME );
+
+            Program.MainForm.tbCostOfTour.Text = " " + bssf.GetCost();
+
             // do a refresh. 
             Program.MainForm.Invalidate();
+
         }
         #endregion
     }
