@@ -96,6 +96,7 @@ namespace TSP
     public class BranchAndBoundState
     {
         Double bound;
+        ArrayList Cities;
         
         public Double GetBound() {
             return bound;
@@ -113,7 +114,7 @@ namespace TSP
 
         public ArrayList GetCities()
         {
-            return null;
+            return Cities;
         }
 
     }
@@ -134,7 +135,7 @@ namespace TSP
         public TSPSolution(ArrayList iroute)
         {
             Route = new ArrayList(iroute);
-            cost = GetCost(); // DF: negative will be a safe default, as all distance values in the problem are positive
+            cost = GetCost(); 
         }
 
 
