@@ -30,21 +30,46 @@ namespace TSP
             return bssf;
         }
 
-        // Base code for this method provided with CS312 TSP project
-        // Currently just grabs the Cities in the order they were provided
-        // TODO: We should tighten up this bound initially. Maybe greedily add nearest?
+        // greedy algorithm implementation for first bssf solution
         private TSPSolution GenerateQuickSolution()
         {
-            int x;
-            Route = new ArrayList(); 
+            // initialize data structures
+            Route = new ArrayList();
+            HashSet<City> citiesLeft = new HashSet<City>(Cities);
+            Route.Add(Cities[0]);
+            citiesLeft.Remove(Cities[0]);
+            
 
-            for (x = 0; x < Cities.Length; x++)
+            while (citiesLeft.Count != 0)
             {
-                Route.Add( Cities[Cities.Length - x -1]);
+                City currentCity = Route[Route.Count - 1] as City;
+                double bestCost = Double.PositiveInfinity;
+                City bestCity = null;
+
+                // go through cities left to find the best cost
+                foreach (City city in citiesLeft)
+                {
+                    double cost = currentCity.costToGetTo(city);
+                    if (cost < bestCost)
+                    {
+                        bestCity = city;
+                        bestCost = cost;
+                    }
+                }
+
+                // I don't think it will be null, but just incase...
+                if (bestCity == null)
+                {
+                    throw new System.ArgumentNullException();
+                }
+
+                Route.Add(bestCity);
+                citiesLeft.Remove(bestCity);
+
+
             }
 
             return new TSPSolution(Route);
-
         }
 
         private BranchAndBoundState init_state() {
