@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TSP
 {
-    class City
+    public class City
     {
         public const double INCREASE_Y = 1000;
         public const double DECREASE_Y = 1000;
