@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Timers;
 using PriorityQueue;
+using System.Linq;
 
 namespace TSP
 {
@@ -75,16 +76,43 @@ namespace TSP
         private BranchAndBoundState init_state() {
             return null;
         }
+
+        private Double[,] generateCostMatrix()
+        {
+            Double[,] matrix = new Double[Cities.Length,Cities.Length];
+
+            for (int from_index = 0; from_index < Cities.Length; from_index++)
+            {
+                for (int to_index = 0; to_index < Cities.Length; to_index++) 
+                {
+                    City from = Cities[from_index];
+                    City to = Cities[to_index];
+
+                    if( to_index == from_index)
+                    {
+                        matrix[from_index, to_index] = Double.PositiveInfinity;
+                    }
+                    else
+                    {
+                        matrix[from_index, to_index] = from.costToGetTo(to);
+                    }
+                }
+            }
+
+            return matrix;
+        }
         
         public TSPSolution AnalyzePath( int max_running_time ) {
 
-            BranchAndBoundState state = new BranchAndBoundState();
+            BranchAndBoundState initial_state = new BranchAndBoundState( generateCostMatrix(), new ArrayList() );
+
+            initial_state.Reduce();
 
             bssf = GenerateQuickSolution();
             
             agenda.Clear();
 
-            agenda.Enqueue( state.GetBound(), state );
+            agenda.Enqueue( initial_state.GetBound(), initial_state );
 
             while( !agenda.IsEmpty && !this.timeIsUp && bssf.GetCost() != agenda.Peek().Value.GetBound() )
             {
@@ -120,8 +148,92 @@ namespace TSP
 
     public class BranchAndBoundState
     {
+        Double[,] costMatrix;
         Double bound;
         ArrayList Cities;
+
+        public BranchAndBoundState( Double[,] cost_matrix, ArrayList cities)
+        {
+            costMatrix = cost_matrix;
+            bound = 0;
+            Cities = cities;
+        }
+
+        public void Reduce()
+        {
+            ReduceRows();
+            ReduceCols();
+        }
+
+        private void ReduceCols()
+        {
+            // reduce all cols
+            for (int col = 0; col < costMatrix.GetLength(1); col++)
+            {
+                Double min_so_far = Double.PositiveInfinity;
+
+                // Find minimum value in current row
+                for (int row = 0; row < costMatrix.GetLength(0); row++)
+                {
+                    // ignore same from/to values
+                    if (row != col && costMatrix[row, col] < min_so_far)
+                    {
+                        min_so_far = costMatrix[row, col];
+                    }
+                }
+
+                // Reduce all values in this row by the minimum (unless Positive Infinity)
+                if (!Double.IsPositiveInfinity(min_so_far))
+                {
+                    for (int row = 0; row < costMatrix.GetLength(0); row++)
+                    {
+                        // If we haven't already eliminated this path, reduce it
+                        if (!Double.IsPositiveInfinity(costMatrix[col, row]))
+                        {
+                            costMatrix[row, col] = costMatrix[row, col] - min_so_far;
+                        }
+                    }
+
+                    // update our bound with the reduction
+                    bound += min_so_far;
+                }
+            }
+        }
+
+        private void ReduceRows()
+        {
+            // reduce all rows
+            for (int row = 0; row < costMatrix.GetLength(0); row++)
+            {
+                Double min_so_far = Double.PositiveInfinity;
+
+                // Find minimum value in current row
+                for (int col = 0; col < costMatrix.GetLength(1); col++)
+                {
+                    // ignore same from/to values
+                    if (col != row && costMatrix[row, col] < min_so_far)
+                    {
+                        min_so_far = costMatrix[row, col];
+                    }
+                }
+
+                // Reduce all values in this row by the minimum (unless Positive Infinity)
+                if (!Double.IsPositiveInfinity(min_so_far))
+                {
+                    for (int col = 0; col < costMatrix.GetLength(1); col++)
+                    {
+                        // If we haven't already eliminated this path, reduce it
+                        if (! Double.IsPositiveInfinity(costMatrix[row, col]))
+                        {
+                            costMatrix[row, col] = costMatrix[row, col] - min_so_far;
+                        }
+                    }
+
+                    // update our bound with the reduction
+                    bound += min_so_far;
+                }
+            }
+        }
         
         public Double GetBound() {
             return bound;
@@ -157,7 +269,7 @@ namespace TSP
         public ArrayList Route;
         private Double cost;
 
-        public TSPSolution(ArrayList iroute)
+        public TSPSolution(ArrayList iroute) : base(null, iroute)
         {
             Route = new ArrayList(iroute);
             cost = GetCost(); 
