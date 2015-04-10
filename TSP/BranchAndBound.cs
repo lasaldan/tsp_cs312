@@ -13,14 +13,14 @@ namespace TSP
     {
         private City[] Cities;
         private ArrayList Route;
-        private TSPSolution bssf; 
-        private PriorityQueue<Double,BranchAndBoundState> agenda;
+        private TSPSolution bssf;
+        private PriorityQueue<Double, BranchAndBoundState> agenda;
 
         private static Timer timer;
 
         private static bool timeIsUp;
 
-        public BranchAndBound( City[] cities)
+        public BranchAndBound(City[] cities)
         {
             this.Cities = cities;
             Route = new ArrayList();
@@ -37,7 +37,7 @@ namespace TSP
             timeIsUp = true;
         }
 
-        public TSPSolution GetBSSF() 
+        public TSPSolution GetBSSF()
         {
             return bssf;
         }
@@ -50,7 +50,7 @@ namespace TSP
             HashSet<City> citiesLeft = new HashSet<City>(Cities);
             Route.Add(Cities[0]);
             citiesLeft.Remove(Cities[0]);
-            
+
 
             while (citiesLeft.Count != 0)
             {
@@ -84,22 +84,23 @@ namespace TSP
             return new TSPSolution(Route);
         }
 
-        private BranchAndBoundState init_state() {
+        private BranchAndBoundState init_state()
+        {
             return null;
         }
 
         private Double[,] generateCostMatrix()
         {
-            Double[,] matrix = new Double[Cities.Length,Cities.Length];
+            Double[,] matrix = new Double[Cities.Length, Cities.Length];
 
             for (int from_index = 0; from_index < Cities.Length; from_index++)
             {
-                for (int to_index = 0; to_index < Cities.Length; to_index++) 
+                for (int to_index = 0; to_index < Cities.Length; to_index++)
                 {
                     City from = Cities[from_index];
                     City to = Cities[to_index];
 
-                    if( to_index == from_index)
+                    if (to_index == from_index)
                     {
                         matrix[from_index, to_index] = Double.PositiveInfinity;
                     }
@@ -112,42 +113,50 @@ namespace TSP
 
             return matrix;
         }
-        
-        public TSPSolution AnalyzePath( int max_running_time ) {
+
+        public TSPSolution AnalyzePath(int max_running_time)
+        {
 
             timer.Interval = max_running_time * 1000;
             timer.Start();
             DateTime startTime = DateTime.Now;
-	
-            BranchAndBoundState initial_state = new BranchAndBoundState( generateCostMatrix(), new List<int>());
+
+            BranchAndBoundState initial_state = new BranchAndBoundState(generateCostMatrix(), new List<int>());
 
             initial_state.Reduce();
 
             bssf = GenerateQuickSolution();
-            
+
             agenda.Clear();
 
-            agenda.Enqueue( initial_state.GetBound(), initial_state );
+            agenda.Enqueue(initial_state.GetBound(), initial_state);
 
-            while( !agenda.IsEmpty && !timeIsUp && bssf.GetCost() != agenda.Peek().Value.GetBound() )
+            while (!agenda.IsEmpty && !timeIsUp && bssf.GetCost() != agenda.Peek().Value.GetBound())
             {
                 BranchAndBoundState u = agenda.Dequeue().Value;
 
-                if( u.GetBound() < bssf.GetCost()) {
+                if (u.GetBound() < bssf.GetCost())
+                {
                     ArrayList successors = u.GetSuccessors();
 
-                    foreach( BranchAndBoundState w in successors ) 
+                    foreach (BranchAndBoundState w in successors)
                     {
-                        if( timeIsUp ) break; 
-                        
-                        if( w.GetBound() < bssf.GetCost())
+                        //if( timeIsUp ) break; 
+
+                        if (w.GetBound() < bssf.GetCost())
                         {
-                            if( w.IsSolution() ) 
+                            if (w.IsSolution())
                             {
-                                Console.WriteLine("Updating BSSF: ");
-                                Console.WriteLine("Old-" + bssf.GetCost() );
-                                bssf = new TSPSolution(w.GetCities(Cities));
-                                Console.WriteLine("New-" + bssf.GetCost() );
+                                TSPSolution possibleBSSF = new TSPSolution(w.GetCities(Cities));
+                                if (possibleBSSF.GetCost() < bssf.GetCost())
+                                {
+                                    Debug.WriteLine("Updating BSSF: ");
+                                    Debug.WriteLine("Old-" + bssf.GetCost());
+                                    bssf = possibleBSSF;
+                                    Debug.WriteLine("New-" + bssf.GetCost());
+
+                                }
+
                             }
                             else
                             {
@@ -172,14 +181,14 @@ namespace TSP
         Double[,] costMatrix;
         Double bound;
         List<int> Cities;
-        
 
-        public BranchAndBoundState( Double[,] cost_matrix, List<int> cities, Double _bound = 0)
+
+        public BranchAndBoundState(Double[,] cost_matrix, List<int> cities, Double _bound = 0)
         {
             costMatrix = cost_matrix;
             bound = _bound;
             Cities = cities;
-            
+
         }
 
         public void Reduce()
@@ -211,7 +220,7 @@ namespace TSP
                     for (int row = 0; row < costMatrix.GetLength(0); row++)
                     {
                         // If we haven't already eliminated this path, reduce it
-                        if (!Double.IsPositiveInfinity(costMatrix[col, row]))
+                        if (!Double.IsPositiveInfinity(costMatrix[row, col]))
                         {
                             costMatrix[row, col] = costMatrix[row, col] - min_so_far;
                         }
@@ -246,7 +255,7 @@ namespace TSP
                     for (int col = 0; col < costMatrix.GetLength(1); col++)
                     {
                         // If we haven't already eliminated this path, reduce it
-                        if (! Double.IsPositiveInfinity(costMatrix[row, col]))
+                        if (!Double.IsPositiveInfinity(costMatrix[row, col]))
                         {
                             costMatrix[row, col] = costMatrix[row, col] - min_so_far;
                         }
@@ -257,15 +266,17 @@ namespace TSP
                 }
             }
         }
-        
-        public Double GetBound() {
+
+        public Double GetBound()
+        {
             return bound;
         }
 
-        
 
-        public ArrayList GetSuccessors() {
-                       
+
+        public ArrayList GetSuccessors()
+        {
+
             // if we have no starting point, add the first city to the list
             if (Cities.Count == 0)
             {
@@ -282,10 +293,10 @@ namespace TSP
                 {
                     List<int> newCities = new List<int>(Cities);
                     newCities.Add(i);
-                    successors.Add( generateBranchAndBoundState(costMatrix, newCities, this.bound + costMatrix[latestCity, i]) );
+                    successors.Add(generateBranchAndBoundState(costMatrix, newCities, this.bound + costMatrix[latestCity, i]));
                 }
             }
-            
+
             return successors;
         }
 
@@ -331,17 +342,18 @@ namespace TSP
         }
 
         // aka Criterion
-        public bool IsSolution() {
+        public bool IsSolution()
+        {
             //return false;
 
             // would this be the right implementation of IsSolution?  Basically asking if our cities
             // array is full?
             // df - I think that'll work.
             return (Cities.Count == costMatrix.GetLength(0));
-            
+
         }
 
-        
+
         public ArrayList GetCities(City[] masterCities)
         {
             ArrayList result = new ArrayList();
@@ -374,7 +386,7 @@ namespace TSP
         }
 
     }
-    
+
     // Base code for this class provided with CS312 TSP project
     public class TSPSolution
     {
@@ -391,7 +403,7 @@ namespace TSP
         public TSPSolution(ArrayList iroute)// : base(null, new List<int>(), ref new City[0])
         {
             Route = new ArrayList(iroute);
-            cost = GetCost(); 
+            cost = GetCost();
         }
 
 
@@ -411,10 +423,10 @@ namespace TSP
 
             // go through each edge in the route and add up the cost. 
             int x;
-            City here; 
+            City here;
             double cost = 0D;
-                
-            for (x = 0; x < Route.Count-1; x++)
+
+            for (x = 0; x < Route.Count - 1; x++)
             {
                 here = Route[x] as City;
                 cost += here.costToGetTo(Route[x + 1] as City);
@@ -422,7 +434,7 @@ namespace TSP
             // go from the last city to the first. 
             here = Route[Route.Count - 1] as City;
             cost += here.costToGetTo(Route[0] as City);
-            return cost; 
+            return cost;
         }
     }
 }
