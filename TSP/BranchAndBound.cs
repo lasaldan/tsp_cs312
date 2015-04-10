@@ -264,7 +264,7 @@ namespace TSP
                 {
                     List<int> newCities = new List<int>(Cities);
                     newCities.Add(i);
-                    successors.Add( generateBranchAndBoundState(costMatrix, newCities, this.bound) );
+                    successors.Add( generateBranchAndBoundState(costMatrix, newCities, this.bound + costMatrix[latestCity, i]) );
                 }
             }
             
