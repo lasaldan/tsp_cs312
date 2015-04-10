@@ -194,6 +194,9 @@ namespace TSP
             Program.MainForm.tbElapsedTime.Text = " " + (endTime - startTime);
             Program.MainForm.MaxAgendaSizeTextBox.Text = maxAgendaSize.ToString();
 
+            Debug.WriteLine("Resulting JSON:");
+            Debug.WriteLine(bssf.ToString());
+
             return bssf;
 
         }
@@ -468,6 +471,33 @@ namespace TSP
             here = Route[Route.Count - 1] as City;
             cost += here.costToGetTo(Route[0] as City);
             return cost; 
+        }
+
+        
+        public String ToString()
+        {
+
+            StringBuilder builder = new StringBuilder();
+
+
+
+            builder.Append('[');
+
+            foreach (City c in Route)
+            {
+
+                builder.Append("[" + c.X + "," + c.Y + "],");
+
+            }
+
+            builder.Remove(builder.Length - 1, 1); //Remove extra comma at end
+
+            builder.Append(']');
+
+
+
+            return builder.ToString();
+
         }
     }
 }
