@@ -206,11 +206,11 @@ namespace TSP
         ///  solve the problem.  This is the entry point for the solver when the run button is clicked
         /// right now it just picks a simple solution. 
         /// </summary>
-        public void solveProblem()
+        public void solveProblem(bool runBaselineAlgorithm)
         {
             solver = new BranchAndBound( Cities );
-
-            bssf = solver.AnalyzePath( MAX_RUNNING_TIME );
+            
+            bssf = solver.AnalyzePath( MAX_RUNNING_TIME, runBaselineAlgorithm );
 
             Program.MainForm.tbCostOfTour.Text = " " + bssf.GetCost();
 

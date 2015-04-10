@@ -120,7 +120,7 @@ namespace TSP
             return matrix;
         }
         
-        public TSPSolution AnalyzePath( int max_running_time ) {
+        public TSPSolution AnalyzePath( int max_running_time, bool useBaseAlgorithm = false ) {
 
             int maxAgendaSize = 0;
 
@@ -128,6 +128,20 @@ namespace TSP
             timer.Interval = max_running_time * 1000;
             timer.Start();
             DateTime startTime = DateTime.Now;
+
+            if (useBaseAlgorithm)
+            {
+                bssf = GenerateQuickSolution();
+
+                // end timer and display the results
+                DateTime quickEndTime = DateTime.Now;
+                Program.MainForm.tbElapsedTime.Text = " " + (quickEndTime - startTime);
+                
+                Debug.WriteLine("Resulting JSON:");
+                Debug.WriteLine(bssf.ToString());
+
+                return bssf;
+            }
 	    
             // get initial state - creating the costmatrix with the given cities
             BranchAndBoundState initial_state = new BranchAndBoundState( generateCostMatrix(), new List<int>());

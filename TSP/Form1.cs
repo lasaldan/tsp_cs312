@@ -74,7 +74,7 @@ namespace TSP
 
         private void btnRun_Click(object sender, EventArgs e)
         {
-            CityData.solveProblem();
+            CityData.solveProblem(baselineCheckBox.Checked);
         }
 
         private void bNewProblem_Click(object sender, EventArgs e)

@@ -49,6 +49,7 @@ namespace TSP
             this.tbElapsedTime = new System.Windows.Forms.ToolStripTextBox();
             this.toolStripLabel6 = new System.Windows.Forms.ToolStripLabel();
             this.MaxAgendaSizeTextBox = new System.Windows.Forms.ToolStripTextBox();
+            this.baselineCheckBox = new System.Windows.Forms.CheckBox();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -75,9 +76,9 @@ namespace TSP
             this.tbElapsedTime,
             this.toolStripLabel6,
             this.MaxAgendaSizeTextBox});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 472);
+            this.toolStrip1.Location = new System.Drawing.Point(0, 479);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1058, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(1251, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -206,11 +207,22 @@ namespace TSP
             this.MaxAgendaSizeTextBox.Text = "--";
             this.MaxAgendaSizeTextBox.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
+            // baselineCheckBox
+            // 
+            this.baselineCheckBox.AutoSize = true;
+            this.baselineCheckBox.Location = new System.Drawing.Point(1041, 479);
+            this.baselineCheckBox.Name = "baselineCheckBox";
+            this.baselineCheckBox.Size = new System.Drawing.Size(118, 17);
+            this.baselineCheckBox.TabIndex = 1;
+            this.baselineCheckBox.Text = "Baseline Algorithm?";
+            this.baselineCheckBox.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1058, 497);
+            this.ClientSize = new System.Drawing.Size(1251, 504);
+            this.Controls.Add(this.baselineCheckBox);
             this.Controls.Add(this.toolStrip1);
             this.Name = "Form1";
             this.Text = "Traveling Sales Person";
@@ -245,6 +257,7 @@ namespace TSP
         private System.Windows.Forms.ToolStripLabel lblProblem;
         private System.Windows.Forms.ToolStripLabel toolStripLabel6;
         public System.Windows.Forms.ToolStripTextBox MaxAgendaSizeTextBox;
+        private System.Windows.Forms.CheckBox baselineCheckBox;
 
 
 
