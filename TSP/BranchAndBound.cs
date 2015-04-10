@@ -115,6 +115,8 @@ namespace TSP
         
         public TSPSolution AnalyzePath( int max_running_time ) {
 
+            int maxAgendaSize = 0;
+
             timer.Interval = max_running_time * 1000;
             timer.Start();
             DateTime startTime = DateTime.Now;
@@ -131,6 +133,10 @@ namespace TSP
 
             while (!agenda.IsEmpty && !timeIsUp && bssf.GetCost() != agenda.Peek().Value.GetBound())
             {
+                if (agenda.Count > maxAgendaSize)
+                {
+                    maxAgendaSize = agenda.Count;
+                }
                 BranchAndBoundState u = agenda.Dequeue().Value;
 
                 if( u.GetBound() < bssf.GetCost()) {
@@ -161,8 +167,11 @@ namespace TSP
                 }
             }
 
+
+
             DateTime endTime = DateTime.Now;
             Program.MainForm.tbElapsedTime.Text = " " + (endTime - startTime);
+            Program.MainForm.MaxAgendaSizeTextBox.Text = maxAgendaSize.ToString();
 
             return bssf;
 
