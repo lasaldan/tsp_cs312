@@ -42,7 +42,10 @@ namespace TSP
             return bssf;
         }
 
-        // greedy algorithm implementation for first bssf solution
+        /// <summary>
+        /// Greedy algorithm implementation for first bssf solution
+        /// </summary>
+        /// <returns></returns>
         private TSPSolution GenerateQuickSolution()
         {
             // initialize data structures
@@ -88,6 +91,10 @@ namespace TSP
             return null;
         }
 
+        /// <summary>
+        /// Creates cost matrix based on the cities list.  Places infinity on the diagonal too.
+        /// </summary>
+        /// <returns></returns>
         private Double[,] generateCostMatrix()
         {
             Double[,] matrix = new Double[Cities.Length,Cities.Length];
@@ -117,44 +124,58 @@ namespace TSP
 
             int maxAgendaSize = 0;
 
+            // start timer
             timer.Interval = max_running_time * 1000;
             timer.Start();
             DateTime startTime = DateTime.Now;
-	
+	    
+            // get initial state - creating the costmatrix with the given cities
             BranchAndBoundState initial_state = new BranchAndBoundState( generateCostMatrix(), new List<int>());
 
+            // reduce the matrix
             initial_state.Reduce();
 
+            // create bssf using the greedy algorithm
             bssf = GenerateQuickSolution();
             
+            // add initial state to the queue
             agenda.Clear();
-
             agenda.Enqueue( initial_state.GetBound(), initial_state );
 
             while (!agenda.IsEmpty && !timeIsUp && bssf.GetCost() != agenda.Peek().Value.GetBound())
             {
+                // checking size of agenda to find the max size
                 if (agenda.Count > maxAgendaSize)
                 {
                     maxAgendaSize = agenda.Count;
                 }
+
                 BranchAndBoundState u = agenda.Dequeue().Value;
 
+                // check to see if current state is worth exploring (i.e. it could be better than the bssf)
                 if( u.GetBound() < bssf.GetCost()) {
+
+                    // generate successors
                     ArrayList successors = u.GetSuccessors();
 
+                    // iterate through successors and either add them to queue, throw them away, or replace the bssf with them
                     foreach( BranchAndBoundState w in successors ) 
                     {
                         if (timeIsUp) break; 
                         
+                        // check if possibly better than the bssf, otherwise prune/toss it out
                         if( w.GetBound() < bssf.GetCost())
                         {
+                            // check if it has a complete path, otherwise add it to the agenda
                             if( w.IsSolution() ) 
                             {
+                                // create the TSP solution
                                 TSPSolution possibleBSSF = new TSPSolution(w.GetCities(Cities));
+
+                                // check if cost of solution is better than cost of bssf.  if so, replace bssf
                                 if (possibleBSSF.GetCost() < bssf.GetCost())
                                 {
                                     bssf = possibleBSSF;
-                                    
                                 }
                                 
                             }
@@ -168,7 +189,7 @@ namespace TSP
             }
 
 
-
+            // end timer and display the results
             DateTime endTime = DateTime.Now;
             Program.MainForm.tbElapsedTime.Text = " " + (endTime - startTime);
             Program.MainForm.MaxAgendaSizeTextBox.Text = maxAgendaSize.ToString();
@@ -179,6 +200,9 @@ namespace TSP
 
     }
 
+    /// <summary>
+    /// BranchAndBoundState class holds the cost matrix, reduces the matrix, generates the successors, etc.
+    /// </summary>
     public class BranchAndBoundState
     {
         Double[,] costMatrix;
@@ -194,6 +218,9 @@ namespace TSP
             
         }
 
+        /// <summary>
+        /// Implementation of reduce algorithm discussed in class.  It updates the bound as well.
+        /// </summary>
         public void Reduce()
         {
             ReduceRows();
@@ -275,7 +302,12 @@ namespace TSP
         }
 
         
-
+        /// <summary>
+        /// Generates the successors from the costMatrix.
+        /// Uses the current path of cities to figure out the next city to explore
+        /// Returns all of the possible successors.
+        /// </summary>
+        /// <returns></returns>
         public ArrayList GetSuccessors() {
                        
             // if we have no starting point, add the first city to the list
@@ -366,6 +398,7 @@ namespace TSP
             return result;
         }
 
+        // helpful for debugging
         public void printMatrix()
         {
             for (int i = 0; i < costMatrix.GetLength(0); i++)
