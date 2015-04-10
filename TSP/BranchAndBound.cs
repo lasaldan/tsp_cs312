@@ -130,9 +130,10 @@ namespace TSP
                         {
                             if( w.IsSolution() ) 
                             {
-                                Console.WriteLine("Updating BSSF: Old-" + bssf.GetCost() );
+                                Console.WriteLine("Updating BSSF: ");
+                                Console.WriteLine("Old-" + bssf.GetCost() );
                                 bssf = new TSPSolution(w.GetCities(Cities));
-                                Console.Write(" New-" + bssf.GetCost() );
+                                Console.WriteLine("New-" + bssf.GetCost() );
                             }
                             else
                             {
