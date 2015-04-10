@@ -129,7 +129,7 @@ namespace TSP
 
             agenda.Enqueue( initial_state.GetBound(), initial_state );
 
-            while( !agenda.IsEmpty && !timeIsUp && bssf.GetCost() != agenda.Peek().Value.GetBound() )
+            while (!agenda.IsEmpty && !timeIsUp && bssf.GetCost() != agenda.Peek().Value.GetBound())
             {
                 BranchAndBoundState u = agenda.Dequeue().Value;
 
@@ -138,7 +138,7 @@ namespace TSP
 
                     foreach( BranchAndBoundState w in successors ) 
                     {
-                        //if( timeIsUp ) break; 
+                        if (timeIsUp) break; 
                         
                         if( w.GetBound() < bssf.GetCost())
                         {
@@ -147,11 +147,8 @@ namespace TSP
                                 TSPSolution possibleBSSF = new TSPSolution(w.GetCities(Cities));
                                 if (possibleBSSF.GetCost() < bssf.GetCost())
                                 {
-                                    Debug.WriteLine("Updating BSSF: ");
-                                    Debug.WriteLine("Old-" + bssf.GetCost());
                                     bssf = possibleBSSF;
-                                    Debug.WriteLine("New-" + bssf.GetCost());
-
+                                    
                                 }
                                 
                             }
@@ -354,7 +351,7 @@ namespace TSP
 
             for (int i = 0; i < Cities.Count; i++)
             {
-                result.Add(masterCities[i]);
+                result.Add(masterCities[Cities[i]]);
             }
 
             return result;
