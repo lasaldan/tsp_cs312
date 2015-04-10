@@ -16,7 +16,9 @@ namespace TSP
         private TSPSolution bssf; 
         private PriorityQueue<Double,BranchAndBoundState> agenda;
 
-        private bool timeIsUp;
+        private static Timer timer;
+
+        private static bool timeIsUp;
 
         public BranchAndBound( City[] cities)
         {
@@ -25,6 +27,14 @@ namespace TSP
             bssf = new TSPSolution(Route);
             agenda = new PriorityQueue<double, BranchAndBoundState>();
             timeIsUp = false;
+
+            timer = new System.Timers.Timer();
+            timer.Elapsed += new ElapsedEventHandler(TimeIsUp);
+        }
+
+        private static void TimeIsUp(object source, ElapsedEventArgs e)
+        {
+            timeIsUp = true;
         }
 
         public TSPSolution GetBSSF() 
@@ -105,6 +115,10 @@ namespace TSP
         
         public TSPSolution AnalyzePath( int max_running_time ) {
 
+            timer.Interval = max_running_time * 1000;
+            timer.Start();
+            DateTime startTime = DateTime.Now;
+	
             BranchAndBoundState initial_state = new BranchAndBoundState( generateCostMatrix(), new List<int>());
 
             initial_state.Reduce();
@@ -115,7 +129,7 @@ namespace TSP
 
             agenda.Enqueue( initial_state.GetBound(), initial_state );
 
-            while( !agenda.IsEmpty && !this.timeIsUp && bssf.GetCost() != agenda.Peek().Value.GetBound() )
+            while( !agenda.IsEmpty && !timeIsUp && bssf.GetCost() != agenda.Peek().Value.GetBound() )
             {
                 BranchAndBoundState u = agenda.Dequeue().Value;
 
@@ -124,7 +138,7 @@ namespace TSP
 
                     foreach( BranchAndBoundState w in successors ) 
                     {
-                        if( this.timeIsUp ) break; 
+                        if( timeIsUp ) break; 
                         
                         if( w.GetBound() < bssf.GetCost())
                         {
@@ -143,6 +157,9 @@ namespace TSP
                     }
                 }
             }
+
+            DateTime endTime = DateTime.Now;
+            Program.MainForm.tbElapsedTime.Text = " " + (endTime - startTime);
 
             return bssf;
 
