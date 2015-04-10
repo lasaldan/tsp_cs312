@@ -140,7 +140,7 @@ namespace TSP
             
             // add initial state to the queue
             agenda.Clear();
-            agenda.Enqueue( initial_state.GetBound(), initial_state );
+            agenda.Enqueue( initial_state.GetBound() / initial_state.getDepthLevel(), initial_state );
 
             while (!agenda.IsEmpty && !timeIsUp && bssf.GetCost() != agenda.Peek().Value.GetBound())
             {
@@ -151,6 +151,8 @@ namespace TSP
                 }
 
                 BranchAndBoundState u = agenda.Dequeue().Value;
+
+                Debug.WriteLine("Exploring at Level: " + u.getDepthLevel());
 
                 // check to see if current state is worth exploring (i.e. it could be better than the bssf)
                 if( u.GetBound() < bssf.GetCost()) {
@@ -181,7 +183,7 @@ namespace TSP
                             }
                             else
                             {
-                                agenda.Enqueue(w.GetBound(), w);
+                                agenda.Enqueue(w.GetBound() / w.getDepthLevel(), w);
                             }
                         }
                     }
@@ -211,14 +213,21 @@ namespace TSP
         Double[,] costMatrix;
         Double bound;
         List<int> Cities;
+        int depthLevel;
         
 
-        public BranchAndBoundState( Double[,] cost_matrix, List<int> cities, Double _bound = 0)
+        public BranchAndBoundState( Double[,] cost_matrix, List<int> cities, Double _bound = 0, int _depthLevel = 1)
         {
             costMatrix = cost_matrix;
             bound = _bound;
             Cities = cities;
+            depthLevel = _depthLevel;
             
+        }
+
+        public int getDepthLevel()
+        {
+            return depthLevel;
         }
 
         /// <summary>
@@ -329,7 +338,7 @@ namespace TSP
                 {
                     List<int> newCities = new List<int>(Cities);
                     newCities.Add(i);
-                    successors.Add( generateBranchAndBoundState(costMatrix, newCities, this.bound + costMatrix[latestCity, i]) );
+                    successors.Add( generateBranchAndBoundState(costMatrix, newCities, this.bound + costMatrix[latestCity, i], this.depthLevel + 1) );
                 }
             }
             
@@ -344,7 +353,7 @@ namespace TSP
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        private BranchAndBoundState generateBranchAndBoundState(double[,] matrix, List<int> cities, Double lowerBound)
+        private BranchAndBoundState generateBranchAndBoundState(double[,] matrix, List<int> cities, Double lowerBound, int depthLevel)
         {
             // building copy
             Double[,] newMatrix = new Double[matrix.GetLength(0), matrix.GetLength(1)];
@@ -372,7 +381,7 @@ namespace TSP
                 newMatrix[to, cities[i]] = Double.PositiveInfinity;
             }
 
-            BranchAndBoundState result = new BranchAndBoundState(newMatrix, cities, lowerBound);
+            BranchAndBoundState result = new BranchAndBoundState(newMatrix, cities, lowerBound, depthLevel);
             result.Reduce();
             return result;
         }
