@@ -44,40 +44,41 @@ namespace TSP
 
            //List<int> c = new List<int>();
 
-           // BranchAndBoundState test = new BranchAndBoundState(cm, c);
+           //BranchAndBoundState test = new BranchAndBoundState(cm, c);
 
-           // System.Diagnostics.Debug.WriteLine("Initial State");
-           // test.printMatrix();
+           //System.Diagnostics.Debug.WriteLine("Initial State Bound: " + test.GetBound());
+           //test.printMatrix();
 
-           // test.Reduce();
+           //test.Reduce();
 
-           // System.Diagnostics.Debug.WriteLine("After reduce");
-           // test.printMatrix();
+           //System.Diagnostics.Debug.WriteLine("After reduce Bound: " + test.GetBound());
+           //test.printMatrix();
 
-           // ArrayList successors = test.GetSuccessors();
+           //ArrayList successors = test.GetSuccessors();
 
-           // System.Diagnostics.Debug.WriteLine("Successors:");
-           // for (int i = 0; i < successors.Count; i++)
-           // {
-           //     BranchAndBoundState s = successors[i] as BranchAndBoundState;
+           //System.Diagnostics.Debug.WriteLine("Successors:");
+           //for (int i = 0; i < successors.Count; i++)
+           //{
+           //    BranchAndBoundState s = successors[i] as BranchAndBoundState;
 
-           //     s.printMatrix();
-           //     System.Diagnostics.Debug.WriteLine("");
-           //     ArrayList nextSuccessors = s.GetSuccessors();
-           //     System.Diagnostics.Debug.WriteLine("");
-           //     System.Diagnostics.Debug.WriteLine("-------Successors of successor----------");
-           //     for (int j = 0; j < nextSuccessors.Count; j++)
-           //     {
-           //         BranchAndBoundState sprime = nextSuccessors[j] as BranchAndBoundState;
-           //         System.Diagnostics.Debug.WriteLine("");
-           //         sprime.printMatrix();
-           //         System.Diagnostics.Debug.WriteLine("");
+           //    System.Diagnostics.Debug.WriteLine("Bound: " + s.GetBound());
+           //    s.printMatrix();
+           //    System.Diagnostics.Debug.WriteLine("");
+           //    ArrayList nextSuccessors = s.GetSuccessors();
+           //    System.Diagnostics.Debug.WriteLine("");
+           //    System.Diagnostics.Debug.WriteLine("-------Successors of successor----------");
+           //    for (int j = 0; j < nextSuccessors.Count; j++)
+           //    {
+           //        BranchAndBoundState sprime = nextSuccessors[j] as BranchAndBoundState;
+           //        System.Diagnostics.Debug.WriteLine("Bound: " + sprime.GetBound());
+           //        sprime.printMatrix();
+           //        System.Diagnostics.Debug.WriteLine("");
 
-           //     }
+           //    }
 
-           //     System.Diagnostics.Debug.WriteLine("-----------------------------");
+           //    System.Diagnostics.Debug.WriteLine("-----------------------------");
 
-           // }
+           //}
 
 
 
