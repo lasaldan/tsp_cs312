@@ -138,16 +138,22 @@ namespace TSP
 
                     foreach( BranchAndBoundState w in successors ) 
                     {
-                        if( timeIsUp ) break; 
+                        //if( timeIsUp ) break; 
                         
                         if( w.GetBound() < bssf.GetCost())
                         {
                             if( w.IsSolution() ) 
                             {
-                                Console.WriteLine("Updating BSSF: ");
-                                Console.WriteLine("Old-" + bssf.GetCost() );
-                                bssf = new TSPSolution(w.GetCities(Cities));
-                                Console.WriteLine("New-" + bssf.GetCost() );
+                                TSPSolution possibleBSSF = new TSPSolution(w.GetCities(Cities));
+                                if (possibleBSSF.GetCost() < bssf.GetCost())
+                                {
+                                    Debug.WriteLine("Updating BSSF: ");
+                                    Debug.WriteLine("Old-" + bssf.GetCost());
+                                    bssf = possibleBSSF;
+                                    Debug.WriteLine("New-" + bssf.GetCost());
+
+                                }
+                                
                             }
                             else
                             {
@@ -211,7 +217,7 @@ namespace TSP
                     for (int row = 0; row < costMatrix.GetLength(0); row++)
                     {
                         // If we haven't already eliminated this path, reduce it
-                        if (!Double.IsPositiveInfinity(costMatrix[col, row]))
+                        if (!Double.IsPositiveInfinity(costMatrix[row, col]))
                         {
                             costMatrix[row, col] = costMatrix[row, col] - min_so_far;
                         }
