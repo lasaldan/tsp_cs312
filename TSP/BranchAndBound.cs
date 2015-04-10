@@ -130,6 +130,7 @@ namespace TSP
                         {
                             if( w.IsSolution() ) 
                             {
+                                //Console.WriteLine("Updating BSSF: New-" + w.GetBound() + " Old-" + bssf.GetCost() );
                                 bssf = new TSPSolution(w.GetCities(Cities));
                             }
                             else
@@ -154,10 +155,10 @@ namespace TSP
         List<int> Cities;
         
 
-        public BranchAndBoundState( Double[,] cost_matrix, List<int> cities, Double bound = 0)
+        public BranchAndBoundState( Double[,] cost_matrix, List<int> cities, Double _bound = 0)
         {
             costMatrix = cost_matrix;
-            bound = 0;
+            bound = _bound;
             Cities = cities;
             
         }
@@ -258,11 +259,11 @@ namespace TSP
 
             for (int i = 0; i < costMatrix.GetLength(0); i++)
             {
-                if (costMatrix[latestCity, i] != Double.PositiveInfinity)
+                if (costMatrix[latestCity, i] != Double.PositiveInfinity && latestCity != i)
                 {
                     List<int> newCities = new List<int>(Cities);
                     newCities.Add(i);
-                    successors.Add( generateBrandAndBoundState(costMatrix, newCities, this.bound) );
+                    successors.Add( generateBranchAndBoundState(costMatrix, newCities, this.bound) );
                 }
             }
             
@@ -277,7 +278,7 @@ namespace TSP
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        private BranchAndBoundState generateBrandAndBoundState(double[,] matrix, List<int> cities, Double lowerBound)
+        private BranchAndBoundState generateBranchAndBoundState(double[,] matrix, List<int> cities, Double lowerBound)
         {
             // building copy
             Double[,] newMatrix = new Double[matrix.GetLength(0), matrix.GetLength(1)];
@@ -299,7 +300,7 @@ namespace TSP
                 newMatrix[i, to] = Double.PositiveInfinity;
             }
 
-            // partial criterion:  if A - B - C, then C !- A OR C !- B
+            // partial criterion:  if A -> B -> C, then C !-> A OR C !-> B
             for (int i = 0; i < cities.Count; i++)
             {
                 newMatrix[to, cities[i]] = Double.PositiveInfinity;
@@ -312,11 +313,12 @@ namespace TSP
 
         // aka Criterion
         public bool IsSolution() {
-            return false;
+            //return false;
 
             // would this be the right implementation of IsSolution?  Basically asking if our cities
             // array is full?
-            //return (Cities.Count == costMatrix.GetLength(0));
+            // df - I think that'll work.
+            return (Cities.Count == costMatrix.GetLength(0));
             
         }
 
@@ -382,8 +384,11 @@ namespace TSP
         public double GetCost()
         {
             // If we've already done the work, just return it
-            if( this.cost > -1 )
-                return this.cost;
+            //if( this.cost > 0 )
+            //    return this.cost;
+
+            if (Route.Count == 0)
+                return 0;
 
             // go through each edge in the route and add up the cost. 
             int x;
