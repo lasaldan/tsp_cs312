@@ -158,7 +158,7 @@ namespace TSP
             agenda.Clear();
             agenda.Enqueue( initial_state.GetBound() / initial_state.getDepthLevel(), initial_state );
 
-            while (!agenda.IsEmpty && !timeIsUp)// && bssf.GetCost() != agenda.Peek().Value.GetBound())
+            while (!agenda.IsEmpty && !timeIsUp && bssf.GetCost() != agenda.Peek().Value.GetBound())
             {
                 // checking size of agenda to find the max size
                 if (agenda.Count > maxAgendaSize)
@@ -189,12 +189,10 @@ namespace TSP
                             {
                                 // create the TSP solution
                                 TSPSolution possibleBSSF = new TSPSolution(w.GetCities(Cities));
-                                Console.WriteLine("Hit Bottom");
 
                                 // check if cost of solution is better than cost of bssf.  if so, replace bssf
                                 if (possibleBSSF.GetCost() < bssf.GetCost())
                                 {
-                                    Console.WriteLine("Updated BSSF:");
                                     bssf = possibleBSSF;
                                 }
                                 
@@ -209,7 +207,6 @@ namespace TSP
                                     if (startProbing)
                                     {
                                         probeMultiplier++;
-                                        Console.WriteLine(probeMultiplier);
                                     }
 
                                     startProbing = false;
