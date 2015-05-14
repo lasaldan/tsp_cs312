@@ -128,6 +128,8 @@ namespace TSP
             timer.Interval = max_running_time * 1000;
             timer.Start();
             DateTime startTime = DateTime.Now;
+            int probeMultiplier = 1;
+            bool startProbing = true;
 
             if (useBaseAlgorithm)
             {
@@ -156,7 +158,7 @@ namespace TSP
             agenda.Clear();
             agenda.Enqueue( initial_state.GetBound() / initial_state.getDepthLevel(), initial_state );
 
-            while (!agenda.IsEmpty && !timeIsUp && bssf.GetCost() != agenda.Peek().Value.GetBound())
+            while (!agenda.IsEmpty && !timeIsUp)// && bssf.GetCost() != agenda.Peek().Value.GetBound())
             {
                 // checking size of agenda to find the max size
                 if (agenda.Count > maxAgendaSize)
@@ -166,7 +168,7 @@ namespace TSP
 
                 BranchAndBoundState u = agenda.Dequeue().Value;
 
-                Debug.WriteLine("Exploring at Level: " + u.getDepthLevel());
+                //Debug.WriteLine("Exploring at Level: " + u.getDepthLevel());
 
                 // check to see if current state is worth exploring (i.e. it could be better than the bssf)
                 if( u.GetBound() < bssf.GetCost()) {
@@ -187,17 +189,40 @@ namespace TSP
                             {
                                 // create the TSP solution
                                 TSPSolution possibleBSSF = new TSPSolution(w.GetCities(Cities));
+                                Console.WriteLine("Hit Bottom");
 
                                 // check if cost of solution is better than cost of bssf.  if so, replace bssf
                                 if (possibleBSSF.GetCost() < bssf.GetCost())
                                 {
+                                    Console.WriteLine("Updated BSSF:");
                                     bssf = possibleBSSF;
                                 }
                                 
                             }
                             else
                             {
-                                agenda.Enqueue(w.GetBound() / w.getDepthLevel(), w);
+                                // With squaring, 4101
+                                int weight = w.getDepthLevel();
+                                
+                                if (DateTime.Now.Second % 4 == 0)
+                                {
+                                    if (startProbing)
+                                    {
+                                        probeMultiplier++;
+                                        Console.WriteLine(probeMultiplier);
+                                    }
+
+                                    startProbing = false;
+
+                                    weight = Cities.Count() * (w.getDepthLevel() * w.getDepthLevel()) * probeMultiplier;
+                                }
+                                else
+                                {
+                                    startProbing = true;
+                                    weight = w.getDepthLevel();
+                                }
+
+                                agenda.Enqueue(w.GetBound() - weight, w);
                             }
                         }
                     }
@@ -210,8 +235,8 @@ namespace TSP
             Program.MainForm.tbElapsedTime.Text = " " + (endTime - startTime);
             Program.MainForm.MaxAgendaSizeTextBox.Text = maxAgendaSize.ToString();
 
-            Debug.WriteLine("Resulting JSON:");
-            Debug.WriteLine(bssf.ToString());
+            Console.WriteLine("Resulting JSON:");
+            Console.WriteLine(bssf.ToString());
 
             return bssf;
 
